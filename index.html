@@ -2,100 +2,164 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Запрошення</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наближення до Гранд Лайн! ☠️</title>
     <style>
+        * { box-sizing: border-box; }
+
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #2b2b2b;
-            color: white;
+            padding: 0;
+            background-color: #000;
+            font-family: 'Georgia', serif;
+            height: 350vh; /* Трохи збільшив висоту для плавності */
+        }
+
+        .viewport {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        #bg-image {
+            width: 100%;
+            height: 100%;
+            background-image: url('sea_bg.png');
+            background-size: cover;
+            background-position: center;
+            will-change: transform;
+            z-index: 1;
+        }
+
+        /* КАРТА З ДИНАМІЧНОЮ ПРОЗОРІСТЮ */
+        .map-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            max-width: 500px;
+            height: 80vh;
+            z-index: 10;
+            /* Початково нуль */
+            opacity: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            /* pointer-events вимикаємо через JS, щоб не тиснути на невидимі кнопки */
+            pointer-events: none;
+            will-change: opacity, transform;
+        }
+
+        .map-parchment {
+            width: 100%;
+            height: 100%;
+            background-image: url('map_vertical.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            padding: 10% 12%;
+            display: flex;
+            flex-direction: column;
             text-align: center;
+            color: #3e2712;
+            filter: drop-shadow(0 15px 40px rgba(0,0,0,0.8));
         }
 
-        .card {
-            background: #3a3a3a;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            width: 320px;
+        h1 { font-size: 1.8rem; margin: 10% 0 5% 0; text-transform: uppercase; }
+        p { font-size: 1rem; line-height: 1.3; margin-bottom: 10px; }
+
+        .input-group { margin-top: auto; margin-bottom: 15px; }
+        #username {
+            background: transparent; border: none; border-bottom: 2px solid #3e2712;
+            font-size: 1.1rem; color: #3e2712; text-align: center; width: 85%; outline: none;
         }
 
-        input {
-            width: 90%;
-            padding: 12px;
-            margin-top: 15px;
-            border-radius: 8px;
-            border: none;
-            font-size: 16px;
+        .seal-buttons { display: flex; justify-content: space-around; padding-bottom: 15%; }
+        .seal {
+            width: 80px; height: 80px; cursor: pointer;
+            background-size: contain; background-repeat: no-repeat;
+            border: none; background-color: transparent;
+            transition: transform 0.2s; position: relative;
         }
+        .btn-yes { background-image: url('seal_yes.png'); }
+        .btn-no { background-image: url('seal_no.png'); }
 
-        .buttons {
-            margin-top: 20px;
+        #result-box {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #fff8dc; border: 5px solid #3e2712; padding: 30px;
+            z-index: 100; display: none; text-align: center; border-radius: 15px;
         }
-
-        button {
-            padding: 12px 20px;
-            margin: 8px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .yes { background: #4CAF50; color: white; }
-        .no { background: #f44336; color: white; }
-
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>🎉 День народження!</h1>
-    <p>Введи своє ім’я:</p>
+    <div class="viewport">
+        <div id="bg-image"></div>
 
-    <input type="text" id="name" placeholder="Твоє ім’я">
-
-    <p>Ти прийдеш?</p>
-
-    <div class="buttons">
-        <button class="yes" onclick="sendAnswer('Так')">Так</button>
-        <button class="no" onclick="sendAnswer('Ні')">Ні</button>
+        <div class="map-overlay" id="map-ui">
+            <div class="map-parchment">
+                <h1>НА БОРТ!</h1>
+                <p>Ми прибули до Острова Риболюдей. Впиши своє ім'я в журнал, Накама!</p>
+                <div class="input-group">
+                    <input type="text" id="username" placeholder="Піратське ім'я..." autocomplete="off">
+                </div>
+                <div class="seal-buttons">
+                    <button class="seal btn-yes" onclick="send('ТАК')"></button>
+                    <button class="seal btn-no" onclick="send('НІ')"></button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <p id="result" class="hidden"></p>
-</div>
+    <div id="result-box"></div>
 
-<script>
-function sendAnswer(choice) {
-    const name = document.getElementById("name").value;
+    <script>
+        const bgImage = document.getElementById('bg-image');
+        const mapUI = document.getElementById('map-ui');
 
-    if (!name) {
-        alert("Введи ім’я!");
-        return;
-    }
+        window.addEventListener('scroll', () => {
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollFraction = window.scrollY / maxScroll;
 
-    // ВСТАВЬ СВОЮ ССЫЛКУ ИЗ GOOGLE FORMS
-    let url = "https://docs.google.com/forms/d/e/1FAIpQLSc5VQU1Ygi6v-CeRc8ju4rDf6Os0_vS-vC6IEEIx0rA6PBnCQ/viewform?usp=pp_url&entry.1163153084=TEST&entry.2136863367=%D0%A2%D0%B0%D0%BA";
+            // 1. ЗУМ ОСТРОВА (від 1.0 до 1.6)
+            const scaleValue = 1 + (scrollFraction * 0.6);
+            bgImage.style.transform = `scale(${scaleValue})`;
 
-    // заменяем значения
-    url = url.replace("TEST", encodeURIComponent(name));
-    url = url.replace("Так", encodeURIComponent(choice));
+            // 2. ДИНАМІЧНА ПРОЗОРІСТЬ КАРТИ
+            // Почнемо проявляти карту після 30% скролу
+            const startVisible = 0.3;
+            if (scrollFraction > startVisible) {
+                // Розраховуємо прозорість від 0 до 1 на залишку шляху
+                let opacityValue = (scrollFraction - startVisible) / (1 - startVisible);
 
-    // меняем viewform → formResponse
-    url = url.replace("viewform", "formResponse");
+                // Робимо наростання прозорості швидшим (можна прибрати, якщо хочеш лінійно)
+                opacityValue = Math.pow(opacityValue, 1.5);
 
-    fetch(url, { method: "POST", mode: "no-cors" });
+                mapUI.style.opacity = opacityValue;
 
-    document.getElementById("result").classList.remove("hidden");
-    document.getElementById("result").innerText =
-        "Дякую, " + name + "! Відповідь записано!";
-}
-</script>
+                // Вмикаємо кнопки тільки коли карта майже прозора (наприклад, 80%)
+                mapUI.style.pointerEvents = opacityValue > 0.8 ? 'auto' : 'none';
 
+                // Додамо легкий ефект "випливання" (transform)
+                const moveUp = 10 - (opacityValue * 10); // від 10px до 0
+                mapUI.style.transform = `translate(-50%, calc(-50% + ${moveUp}px))`;
+            } else {
+                mapUI.style.opacity = 0;
+                mapUI.style.pointerEvents = 'none';
+            }
+        });
+
+        function send(choice) {
+            const name = document.getElementById('username').value.trim();
+            if (!name) { alert("Впиши ім'я!"); return; }
+            alert("Дані відправлено: " + choice);
+            // Тут твоя логіка з Google Формою...
+        }
+    </script>
 </body>
 </html>
