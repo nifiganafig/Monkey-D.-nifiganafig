@@ -2,97 +2,159 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Наближення до Гранд Лайн! ☠️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Гранд Лайн ☠️</title>
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
+            margin: 0; padding: 0;
+            background-color: #002855;
             font-family: 'Georgia', serif;
-            height: 350vh; /* Трохи збільшив висоту для плавності */
+            height: 350vh;
+            overflow-x: hidden;
+            scrollbar-width: none;
         }
 
         .viewport {
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             width: 100%;
             height: 100vh;
+            height: 100dvh; /* Динамічна висота для мобільних */
             overflow: hidden;
             z-index: 1;
+            background: radial-gradient(circle, #00509d 0%, #001a33 100%);
         }
 
         #bg-image {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background-image: url('sea_bg.png');
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             will-change: transform;
-            z-index: 1;
         }
 
-        /* КАРТА З ДИНАМІЧНОЮ ПРОЗОРІСТЮ */
+        #scroll-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 1s ease;
+            pointer-events: none;
+            text-align: center;
+            width: 100%;
+        }
+
         .map-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             width: 95%;
             max-width: 500px;
-            height: 80vh;
+            height: 85vh;
+            height: 85dvh;
             z-index: 10;
-            /* Початково нуль */
             opacity: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* pointer-events вимикаємо через JS, щоб не тиснути на невидимі кнопки */
             pointer-events: none;
             will-change: opacity, transform;
         }
 
         .map-parchment {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background-image: url('map_vertical.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            padding: 10% 12%;
+            padding: 15% 10%; /* Адаптивні відступи */
             display: flex;
             flex-direction: column;
             text-align: center;
             color: #3e2712;
-            filter: drop-shadow(0 15px 40px rgba(0,0,0,0.8));
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
         }
 
-        h1 { font-size: 1.8rem; margin: 10% 0 5% 0; text-transform: uppercase; }
-        p { font-size: 1rem; line-height: 1.3; margin-bottom: 10px; }
+        h1 { font-size: 1.5rem; margin: 5% 0; text-transform: uppercase; }
+        p { font-size: 0.95rem; line-height: 1.3; flex-grow: 1; margin: 0; }
 
-        .input-group { margin-top: auto; margin-bottom: 15px; }
         #username {
-            background: transparent; border: none; border-bottom: 2px solid #3e2712;
-            font-size: 1.1rem; color: #3e2712; text-align: center; width: 85%; outline: none;
+            background: transparent; border: none;
+            font-size: 1.2rem; color: #3e2712;
+            text-align: center; width: 90%; outline: none;
+            font-family: inherit; font-weight: bold;
+            padding: 10px 0;
         }
 
-        .seal-buttons { display: flex; justify-content: space-around; padding-bottom: 15%; }
-        .seal {
-            width: 80px; height: 80px; cursor: pointer;
-            background-size: contain; background-repeat: no-repeat;
-            border: none; background-color: transparent;
-            transition: transform 0.2s; position: relative;
+        .seal-buttons {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20%;
+            width: 100%;
         }
+
+        .seal {
+            width: 25vw; /* Розмір залежить від ширини екрана */
+            height: 25vw;
+            max-width: 110px;
+            max-height: 110px;
+            cursor: pointer;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border: none;
+            background-color: transparent;
+            filter: grayscale(1) opacity(0.5);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        /* Hover для ПК та Active для мобільних */
+        @media (hover: hover) {
+            .seal:not(.selected):hover { filter: grayscale(0) opacity(1); transform: scale(1.1); }
+        }
+        .seal:active { transform: scale(0.9); }
+
+        .seal.selected { filter: grayscale(0) opacity(1); transform: scale(1.2); }
+        .seal.hidden { opacity: 0 !important; transform: scale(0); pointer-events: none; }
+
         .btn-yes { background-image: url('seal_yes.png'); }
         .btn-no { background-image: url('seal_no.png'); }
 
+        /* Адаптація під дуже маленькі екрани (iPhone SE тощо) */
+        @media (max-height: 600px) {
+            h1 { font-size: 1.2rem; }
+            p { font-size: 0.8rem; }
+            .seal { width: 20vw; height: 20vw; }
+        }
+
+        /* ФІНАЛЬНА АНІМАЦІЯ */
+        .fly-back #bg-image {
+            transform: scale(1.0) !important;
+            transition: transform 2.5s cubic-bezier(0.45, 0, 0.55, 1);
+        }
+        .fly-back .map-overlay {
+            opacity: 0 !important;
+            transform: translate(-50%, -50%) scale(0.4) !important;
+            transition: opacity 1.5s ease-in, transform 2s ease-in;
+        }
+
         #result-box {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #fff8dc; border: 5px solid #3e2712; padding: 30px;
-            z-index: 100; display: none; text-align: center; border-radius: 15px;
+            background: #fff8dc; border: 4px solid #3e2712; padding: 25px;
+            z-index: 100; display: none; text-align: center; border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            width: 80%; max-width: 300px;
         }
     </style>
 </head>
@@ -100,65 +162,87 @@
 
     <div class="viewport">
         <div id="bg-image"></div>
+        <div id="scroll-hint">Гортай вниз, щоб наблизитись</div>
 
         <div class="map-overlay" id="map-ui">
             <div class="map-parchment">
                 <h1>НА БОРТ!</h1>
-                <p>Ми прибули до Острова Риболюдей. Впиши своє ім'я в журнал, Накама!</p>
-                <div class="input-group">
-                    <input type="text" id="username" placeholder="Піратське ім'я..." autocomplete="off">
-                </div>
+                <p>Ми підпливли до Острова Риболюдей. <br>Впиши своє ім'я в журнал!</p>
+
+                <form id="pirateForm" target="hidden_iframe" method="POST" action="https://docs.google.com/forms/d/e/1FAIpQLSc5VQU1Ygi6v-CeRc8ju4rDf6Os0_vS-vC6IEEIx0rA6PBnCQ/formResponse">
+                    <div class="input-group">
+                        <input type="text" id="username" name="entry.1163153084" placeholder="Твоє ім'я..." autocomplete="off">
+                    </div>
+                    <input type="hidden" id="choiceField" name="entry.2136863367" value="">
+                </form>
+
                 <div class="seal-buttons">
-                    <button class="seal btn-yes" onclick="send('ТАК')"></button>
-                    <button class="seal btn-no" onclick="send('НІ')"></button>
+                    <button id="btn-yes" class="seal btn-yes" onclick="handleChoice('Так')"></button>
+                    <button id="btn-no" class="seal btn-no" onclick="handleChoice('Ні')"></button>
                 </div>
             </div>
         </div>
     </div>
 
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
     <div id="result-box"></div>
 
     <script>
         const bgImage = document.getElementById('bg-image');
         const mapUI = document.getElementById('map-ui');
+        const hint = document.getElementById('scroll-hint');
+        let choiceMade = false;
+
+        let hintTimeout = setTimeout(() => {
+            if (window.scrollY < 10) hint.style.opacity = "1";
+        }, 5000);
 
         window.addEventListener('scroll', () => {
+            hint.style.opacity = "0";
+            clearTimeout(hintTimeout);
+
+            if (choiceMade) return;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollFraction = window.scrollY / maxScroll;
+            const scrollFraction = Math.min(window.scrollY / maxScroll, 1);
 
-            // 1. ЗУМ ОСТРОВА (від 1.0 до 1.6)
-            const scaleValue = 1 + (scrollFraction * 0.6);
-            bgImage.style.transform = `scale(${scaleValue})`;
+            // Наближення
+            bgImage.style.transform = `scale(${1 + (scrollFraction * 0.7)})`;
 
-            // 2. ДИНАМІЧНА ПРОЗОРІСТЬ КАРТИ
-            // Почнемо проявляти карту після 30% скролу
-            const startVisible = 0.3;
-            if (scrollFraction > startVisible) {
-                // Розраховуємо прозорість від 0 до 1 на залишку шляху
-                let opacityValue = (scrollFraction - startVisible) / (1 - startVisible);
-
-                // Робимо наростання прозорості швидшим (можна прибрати, якщо хочеш лінійно)
-                opacityValue = Math.pow(opacityValue, 1.5);
-
-                mapUI.style.opacity = opacityValue;
-
-                // Вмикаємо кнопки тільки коли карта майже прозора (наприклад, 80%)
-                mapUI.style.pointerEvents = opacityValue > 0.8 ? 'auto' : 'none';
-
-                // Додамо легкий ефект "випливання" (transform)
-                const moveUp = 10 - (opacityValue * 10); // від 10px до 0
-                mapUI.style.transform = `translate(-50%, calc(-50% + ${moveUp}px))`;
-            } else {
-                mapUI.style.opacity = 0;
-                mapUI.style.pointerEvents = 'none';
-            }
+            // Поява карти
+            mapUI.style.opacity = scrollFraction;
+            mapUI.style.pointerEvents = scrollFraction > 0.85 ? 'auto' : 'none';
         });
 
-        function send(choice) {
-            const name = document.getElementById('username').value.trim();
-            if (!name) { alert("Впиши ім'я!"); return; }
-            alert("Дані відправлено: " + choice);
-            // Тут твоя логіка з Google Формою...
+        function handleChoice(type) {
+            const nameInput = document.getElementById('username');
+            const name = nameInput.value.trim();
+            if (!name) { alert("Представся, пірате!"); return; }
+
+            choiceMade = true;
+            document.body.style.overflow = "hidden";
+            nameInput.readOnly = true;
+            document.getElementById('choiceField').value = type;
+
+            if (type === 'Так') {
+                document.getElementById('btn-yes').classList.add('selected');
+                document.getElementById('btn-no').classList.add('hidden');
+            } else {
+                document.getElementById('btn-no').classList.add('selected');
+                document.getElementById('btn-yes').classList.add('hidden');
+            }
+
+            document.getElementById('pirateForm').submit();
+
+            setTimeout(() => {
+                document.body.classList.add('fly-back');
+                setTimeout(() => {
+                    const res = document.getElementById('result-box');
+                    res.style.display = 'block';
+                    res.innerHTML = type === 'Так'
+                        ? `<h3>ВІТАЮ В КОМАНДІ!</h3><p>${name}, готуйся до пригод!</p>`
+                        : `<h3>ШКОДА...</h3><p>${name}, ти залишаєшся на березі.</p>`;
+                }, 2000);
+            }, 2000);
         }
     </script>
 </body>
