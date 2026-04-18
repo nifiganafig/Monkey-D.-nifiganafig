@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Запрошення</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #2b2b2b;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .card {
+            background: #3a3a3a;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 320px;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 8px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .yes { background: #4CAF50; color: white; }
+        .no { background: #f44336; color: white; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🎉 День народження!</h1>
+    <p>Введи своє ім’я:</p>
+
+    <input type="text" id="name" placeholder="Твоє ім’я">
+
+    <p>Ти прийдеш?</p>
+
+    <div class="buttons">
+        <button class="yes" onclick="sendAnswer('Так')">Так</button>
+        <button class="no" onclick="sendAnswer('Ні')">Ні</button>
+    </div>
+
+    <p id="result" class="hidden"></p>
+</div>
+
+<script>
+function sendAnswer(choice) {
+    const name = document.getElementById("name").value;
+    const result = document.getElementById("result");
+
+    if (!name) {
+        alert("Введи ім’я!");
+        return;
+    }
+
+    // 👉 ВСТАВ СЮДИ СВОЮ ССЫЛКУ Google Forms
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc5VQU1Ygi6v-CeRc8ju4rDf6Os0_vS-vC6IEEIx0rA6PBnCQ/viewform?usp=header";
+
+    // открывает форму с ответом
+    window.open(formUrl, "_blank");
+
+    result.classList.remove("hidden");
+    result.innerText = "Дякую, " + name + "! Відповідь: " + choice;
+}
+</script>
+
+</body>
+</html>
