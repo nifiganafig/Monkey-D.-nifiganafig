@@ -16,6 +16,32 @@
         -moz-user-select: none;    /* Firefox */
         -ms-user-select: none;     /* IE/Edge */
         user-select: none;         /* Стандарт */}
+        /* Адаптація для мобільних пристроїв */
+    @media (max-width: 600px) {
+        h1 {
+            font-size: 1.4rem !important; /* Зменшуємо заголовок */
+            margin: 10% 0 5% 0 !important;
+        }
+
+        p {
+            font-size: 0.9rem !important; /* Зменшуємо основний текст */
+            line-height: 1.2 !important;
+        }
+
+        #username {
+            font-size: 1.2rem !important; /* Текст у полі вводу */
+            padding: 10px 0 5px 0 !important;
+        }
+
+        .seal-buttons {
+            padding-bottom: 10% !important; /* Зменшуємо відступ знизу, щоб влізло */
+        }
+
+        .seal {
+            width: 25vw !important; /* Робимо печатки трохи меншими */
+            height: 25vw !important;
+        }
+    }
 
         body {
             margin: 0; padding: 0;
