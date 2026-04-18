@@ -264,13 +264,81 @@
             width: 80%; max-width: 320px;
             font-family: "Rubik Spray Paint", system-ui;
         }
+
+/* --- СТИЛІ ДЛЯ ПОТОПУ (ЗАГЛУШКА ДЛЯ ГОРИЗОНТАЛЬНОГО РЕЖИМУ) --- */
+#landscape-flood {
+    display: none; /* Спочатку приховано */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: #001a33; /* Колір глибокої води */
+    z-index: 9999; /* Поверх усього */
+    color: white;
+    text-align: center;
+    overflow: hidden; /* Щоб хвиля не вилазила */
+    font-family: "Rubik Spray Paint", system-ui;
+}
+
+/* Контент з текстом (спочатку прихований, щоб з'явитися після хвилі) */
+.flood-content {
+    position: relative;
+    z-index: 10;
+    padding: 10% 15%;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Сама хвиля (анімована) */
+.water-wave {
+    position: absolute;
+    bottom: -100%; /* Спочатку хвиля повністю під екраном */
+    left: 0;
+    width: 100%; height: 150%; /* Хвиля вища за екран, щоб залити все */
+    background-color: #0077be; /* Колір океану */
+    background-image: url('wave_pattern.png'); /* Необов'язково: текстура хвилі (якщо є) */
+    background-size: contain;
+    background-repeat: repeat-x;
+    border-top: 10px solid #a2d2ff; /* Світла піна */
+    border-radius: 50% 50% 0 0; /* Форма синусоїди */
+    
+    transition: bottom 2.5s ease-out; /* Плавне підняття хвилі */
+}
+
+/* --- МАГІЯ МЕДІАЗАПИТІВ (АКТИВАЦІЯ ПОТОПУ) --- */
+@media (orientation: landscape) and (max-height: 550px) {
+    /* Показуємо блок потопу тільки в горизонтальному режимі */
+    #landscape-flood {
+        display: block;
+    }
+
+    /* Анімація підняття хвилі (заливає трюм за 2.5 секунди) */
+    #landscape-flood .water-wave {
+        bottom: 0; /* Хвиля піднімається до верху */
+    }
+
+    /* Плавна поява тексту через 1.5 секунди після початку потопу */
+    #landscape-flood .flood-content {
+        animation: fadeInText 1.5s forwards 1.5s;
+    }
+}
+
+/* Ключові кадри для появи тексту */
+@keyframes fadeInText {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+        
     </style>
 </head>
 <body>
-    <div id="landscape-warning">
-        <h2>ПІРАТЕ, ТРЮМ ЗАЛИТО!</h2>
-        <p>Будь ласка, поверни телефон вертикально, щоб читати карту.</p>
+    <div id="landscape-flood">
+    <div class="water-wave"></div> <div class="flood-content">
+        <h2>ТРЮМ ЗАЛИТО! 🌊</h2>
+        <p>Пірате, ти перевернув корабель! Негайно поверни телефон вертикально, поки ми не пішли на дно!</p>
     </div>
+</div>
 
     <div id="intro-overlay">
         <button id="start-button" onclick="launchExperience()">ЗІЙТИ НА БОРТ</button>
