@@ -119,20 +119,21 @@
 
         #scroll-hint {
             position: fixed;
-            bottom: 20px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            z-index: 20;
+            z-index: 5;
             opacity: 0;
             transition: opacity 1s ease;
             pointer-events: none;
             text-align: center;
-            width: 100%;
+            width: 80%;
             font-family: "Rubik Spray Paint", system-ui;
+            text-shadow: 0 0 15px rgba(0,0,0,0.6);
         }
 
         .map-overlay {
@@ -157,13 +158,13 @@
             height: auto;
             max-height: 100%;
             background-image: url('map_vertical.png');
-            background-size: 100% 100%; /* Розтягуємо фон чітко по блоку */
+            background-size: 100% 100%;
             background-repeat: no-repeat;
             background-position: center;
             padding: 15% 12% 10% 12%;
             display: flex;
             flex-direction: column;
-            justify-content: space-evenly; /* Рівномірно розподіляємо елементи всередині */
+            justify-content: space-evenly; 
             text-align: center;
             color: #3e2712;
             filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
@@ -236,7 +237,6 @@
         .btn-yes { background-image: url('seal_yes.png'); }
         .btn-no { background-image: url('seal_no.png'); }
 
-        /* Фікс для відкритої клавіатури або маленьких екранів */
         @media (max-height: 600px) {
             .map-parchment { padding: 10% 10% 5% 10%; }
             h1 { font-size: 1.2rem; margin: 2% 0; }
@@ -265,7 +265,6 @@
             font-family: "Rubik Spray Paint", system-ui;
         }
 
-        /* --- ФІНАЛЬНИЙ ПОТОП --- */
         #landscape-flood {
             position: fixed;
             top: 0; left: 0;
@@ -367,6 +366,7 @@
         const intro = document.getElementById('intro-overlay');
         const viewport = document.getElementById('main-viewport');
         let choiceMade = false;
+        let hintActive = false;
 
         document.body.style.overflowY = "hidden";
 
@@ -377,10 +377,24 @@
                 intro.style.visibility = "hidden";
                 viewport.style.opacity = "1";
                 document.body.style.overflowY = "auto";
+                
+                // Активуємо підказку через 2 секунди після старту
+                setTimeout(() => {
+                    if (window.scrollY < 50 && !choiceMade) {
+                        hint.style.opacity = "1";
+                        hintActive = true;
+                    }
+                }, 2000);
             }, 1000);
         }
 
         function updateView() {
+            // Приховуємо підказку при початку скролу
+            if (window.scrollY > 20 && hintActive) {
+                hint.style.opacity = "0";
+                hintActive = false;
+            }
+
             if (choiceMade) return;
             const scrollY = window.pageYOffset || document.documentElement.scrollTop;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -399,6 +413,7 @@
             if (!name) { alert("Представся, пірате!"); return; }
 
             choiceMade = true;
+            hint.style.opacity = "0";
             document.body.style.overflow = "hidden";
             document.getElementById('username').readOnly = true;
             document.getElementById('choiceField').value = type;
