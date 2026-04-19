@@ -276,13 +276,13 @@
     transition: background-color 0.8s ease, visibility 0.8s; 
 }
 
-/* Стан, коли телефон ПЕРЕВЕРНУТО */
-@media (orientation: landscape) and (max-height: 500px) {
+/* Стан, коли телефон ДІЙСНО ПЕРЕВЕРНУТО (ширина більша за висоту мінімум у 1.2 рази) */
+@media (orientation: landscape) and (max-height: 500px) and (min-aspect-ratio: 13/9) {
     #landscape-flood {
         visibility: visible;
         background-color: rgba(0, 26, 51, 1);
         pointer-events: auto;
-        transition: background-color 0.8s ease; /* Прибираємо затримку при появі */
+        transition: background-color 0.8s ease;
     }
     #landscape-flood .water-wave {
         transform: translateY(-110vh);
@@ -292,6 +292,7 @@
         transition-delay: 0.5s;
     }
 }
+
 
 .water-wave {
     position: absolute;
